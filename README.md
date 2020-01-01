@@ -5,6 +5,7 @@ _So, I decided to actually learn TDD by reading a book. You can find it on
 
 * Chapter 01: Setting up;
 * Chapter 02: Describing a user story as a (functional) test file;
+* Chapter 03: Writing first unit test and tying application with the routing part
 
 
 # Update notes
