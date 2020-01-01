@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpRequest, HttpResponse
 
-# Create your views here.
+
 def home_page(request: HttpRequest) -> HttpResponse:
-    return HttpResponse('<html><title>To-Do lists</title></html>')
+    # It automatically searches for a templates/ dir
+    return render(request, 'home.html')
