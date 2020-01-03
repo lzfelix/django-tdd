@@ -1,8 +1,17 @@
+# Maybe some help?
+# http://www.obeythetestinggoat.com/how-to-get-selenium-to-wait-for-page-load-after-a-click.html
+
 import time
 import unittest
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support import expected_conditions as EC
+
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+
 
 class NewVisitorTest(unittest.TestCase):
     
@@ -38,11 +47,24 @@ class NewVisitorTest(unittest.TestCase):
         # "1: Buy peacock feathers" as a item in the to-do list
         input_box.send_keys(Keys.ENTER)
 
+        expected_text = '1: Buy peacock feathers'
+
+        # NOTE: We have to wait the page to be refreshed. Instead of
+        # a busy wait, one can use the following snippet
+        # (from https://stackoverflow.com/questions/45178817
+        # selenium-with-python-stale-element-reference-exception):
+        WebDriverWait(self.browser, 3).until(
+            expected_conditions.text_to_be_present_in_element(
+                (By.ID, 'id_list_table'), expected_text),
+            f'Timeout, expected finding todo item: "{expected_text}"'
+        )
+
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-            any(row.text == '1: Buy peacock feathres' for row in rows),
-            'New to-do item not in the table'
+        self.assertIn(
+            expected_text,
+            [row.text for row in rows],
+            f'New to-do item not in the table.\nActual text: "{table.text}"'
         )
 
         # There's still a text box to add another item. User adds
