@@ -24,30 +24,18 @@ class NewVisitorTest(unittest.TestCase):
     def tearDown(self):
         self.browser.quit()
     
-    def test_can_start_a_list_and_retrieve_it_later(self):
-        # Check if the page is up
-        self.browser.get('http://localhost:8000')
+    def _add_todo_item(self, text: str) -> None:
+        """Adds item to the todo field and hits Enter."""
 
-        # Ensure that the page title mentions a ToDo list
-        self.assertIn('To-Do', self.browser.title)
-        header_text = self.browser.find_element_by_tag_name('h1').text
-        self.assertIn('To-Do', header_text)
-
-        # User is invited to add a item straight away
+        # User finds the text box
         input_box = self.browser.find_element_by_id('id_new_item')
-        self.assertEqual(
-            input_box.get_attribute('placeholder'),
-            'Enter a to-do item'
-        )
 
-        # User types "Buy peacock feathers" into a text box
-        input_box.send_keys('Buy peacock feathers')
-
-        # When user hits enter, the page updates to display
-        # "1: Buy peacock feathers" as a item in the to-do list
+        # User types new todo item and sends the form
+        input_box.send_keys(text)
         input_box.send_keys(Keys.ENTER)
 
-        expected_text = '1: Buy peacock feathers'
+    def _wait_todo_item_appear(self, expected_text: str) -> None:
+        """Checks if the expected text is in the todo table."""
 
         # NOTE: We have to wait the page to be refreshed. Instead of
         # a busy wait, one can use the following snippet
@@ -67,12 +55,38 @@ class NewVisitorTest(unittest.TestCase):
             f'New to-do item not in the table.\nActual text: "{table.text}"'
         )
 
+    
+    def test_can_start_a_list_and_retrieve_it_later(self):
+        # Check if the page is up
+        self.browser.get('http://localhost:8000')
+
+        # Ensure that the page title mentions a ToDo list
+        self.assertIn('To-Do', self.browser.title)
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn('To-Do', header_text)
+
+        # User is invited to add a item straight away
+        input_box = self.browser.find_element_by_id('id_new_item')
+        self.assertEqual(
+            input_box.get_attribute('placeholder'),
+            'Enter a to-do item'
+        )
+
+        # User types "Buy peacock feathers" into a text box and hits enter
+        self._add_todo_item('Buy peacock feathers')
+
+        # When user hits enter, the page updates to display
+        # "1: Buy peacock feathers" as a item in the to-do list
+        self._wait_todo_item_appear('1: Buy peacock feathers')
+
         # There's still a text box to add another item. User adds
         # "Use peacock to make a fly"
-        self.fail('Everything working up to this point')
+        self._add_todo_item('Use peacock to make a fly')
 
-        # The page  updates again and now shows both items in their
+        # The page updates again and now shows both items in their
         # list.
+        self._wait_todo_item_appear('1: Buy peacock feathers')
+        self._wait_todo_item_appear('2: Use peacock to make a fly')
 
         # The site generates a unique URL for her with some explanatory
         # text
