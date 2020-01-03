@@ -19,3 +19,7 @@ I noted below the changes that I had to make so everything worked as expected._
 - Use `from django.urls import resolve` instead of
     `from django.core.urlresolvers import resolve`;
 - There's no need to use BOL and EOL in URL regexes anymore.
+
+## Chapter 05
+
+- To work around the CSRF token remove if from the HTML before asserting.
