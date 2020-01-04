@@ -81,6 +81,10 @@ class NewVisitorTest(LiveServerTestCase):
         # "1: Buy peacock feathers" as a item in the to-do list
         self._wait_todo_item_appear('1: Buy peacock feathers')
 
+        # Also, the user is taken to a new URL
+        edith_url = self.browser.current_url
+        self.assertRegex(edith_url, r'/lists/.+')
+
         # There's still a text box to add another item. User adds
         # "Use peacock to make a fly"
         self._add_todo_item('Use peacock to make a fly')
@@ -90,11 +94,32 @@ class NewVisitorTest(LiveServerTestCase):
         self._wait_todo_item_appear('1: Buy peacock feathers')
         self._wait_todo_item_appear('2: Use peacock to make a fly')
 
-        # The site generates a unique URL for her with some explanatory
-        # text
+        # Now, a new user, Francis, comes along to the site.
 
-        # User visits the URL and sees that their to-do list is still
-        # there
+        ## <- meta comment
+        ## Using a new browser session to ensure that no information
+        ## from the first user is coming through cookies, etc.
+        self.browser.quit()
+        self.browser = webdriver.Firefox()
 
-        # User quits
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertNotIn('make a fly', page_text)
+
+        # Francis starts a new list by entering a new item.
+        self._add_todo_item('Buy milk')
+        self._wait_todo_item_appear('1: Buy milk')
+
+        # Francis gets his unique URL.
+        francis_url = self.browser.current_url
+        self.assertRegex(francis_url, r'/lists/.+')
+        self.assertNotEqual(francis_url, edith_url)
+
+        # There should be no trace of Edith's list, just Francis' list.
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Buy peacock feathers', page_text)
+        self.assertIn('Buy milk', page_text)
+
+        # Satified, they both go back to sleep.
         self.browser.quit()

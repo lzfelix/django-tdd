@@ -7,9 +7,11 @@ from lists.models import Item
 def home_page(request: HttpRequest) -> HttpResponse:
     if request.method == 'POST':
         Item.objects.create(text=request.POST['item_text'])
-        return redirect('/')
+        return redirect('/lists/first-list/')
 
-    # It automatically searches for a templates/ dir
-    return render(request, 'home.html', {
+    return render(request, 'home.html')
+
+def view_list(request: HttpRequest) -> HttpResponse:
+    return render(request, 'list.html', {
         'items': Item.objects.all()
     })

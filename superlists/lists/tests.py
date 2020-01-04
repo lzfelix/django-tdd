@@ -43,7 +43,7 @@ class HomePageTest(TestCase):
         response = home_page(request)
 
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
+        self.assertEqual(response['location'], '/lists/first-list/')
 
         expected_html = render_to_string(
             'home.html',
@@ -56,15 +56,6 @@ class HomePageTest(TestCase):
         #     self.remove_csrf_tag(expected_html)
         # )
 
-    def test_home_page_displays_all_list_items(self):
-        Item.objects.create(text='item1')
-        Item.objects.create(text='item2')
-
-        response = home_page(HttpRequest())
-
-        self.assertIn('item1', response.content.decode())
-        self.assertIn('item2', response.content.decode())
-
     def test_home_page_only_saves_items_when_necessary(self):
         request = HttpRequest()
         home_page(request)
@@ -74,6 +65,22 @@ class HomePageTest(TestCase):
     def remove_csrf_tag(text: str) -> str:
         """Remove csrf tag from text. See https://groups.google.com/forum/#!topic/obey-the-testing-goat-book/fwY7ifEWKMU"""
         return re.sub(r'<[^>]*csrfmiddlewaretoken[^>]*>', '', text)
+
+class ListViewTest(TestCase):
+
+    def test_uses_list_template(self):
+        response = self.client.get('/lists/first-list/')
+        self.assertTemplateUsed(response, 'list.html')
+
+    def test_displays_all_items(self):
+        Item.objects.create(text='item1')
+        Item.objects.create(text='item2')
+
+        response = self.client.get('/lists/first-list/')
+
+        self.assertContains(response, 'item1')
+        self.assertContains(response, 'item2')
+
 
 class ItemModelTest(TestCase):
     def test_saving_retrieving_items(self):

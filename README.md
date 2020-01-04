@@ -1,7 +1,7 @@
 # Test Driven Development with Django
 
 _So, I decided to actually learn TDD by reading a book. You can find it on
-[Amazon](https://www.amazon.com/Test-Driven-Development-Python-Selenium-JavaScript/dp/1449364829)._
+[Amazon.com](https://www.amazon.com/Test-Driven-Development-Python-Selenium-JavaScript/dp/1449364829)._
 
 * Chapter 01: Setting up;
 * Chapter 02: Describing a user story as a (functional) test file;
@@ -26,5 +26,12 @@ I noted below the changes that I had to make so everything worked as expected._
 
 - To work around the CSRF token remove if from the HTML before asserting.
 - Use `functional_tests::_wait_todo_item_appear()` to avoid Selenium complaining
-    about stale elements. This happens because the page is refreshed, while selenium
-    probably has an instance of a previous DOM element.
+    about stale elements. This happens because the page is refreshed, while
+    selenium probably has an instance of a previous DOM element.
+
+## Chapter 06
+
+- In the functional test, I swapped the order between checking for Francis' milk
+    and comparing his URL to Edith's since Selenium has to wait the page to
+    refresh. Another option would be to use `WebDriverWait()` following
+    `_wait_todo_item_appear()`.
