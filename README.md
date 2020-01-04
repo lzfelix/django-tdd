@@ -4,27 +4,30 @@ _So, I decided to actually learn TDD by reading a book. You can find it on
 [Amazon.com](https://www.amazon.com/Test-Driven-Development-Python-Selenium-JavaScript/dp/1449364829)._
 
 * Chapter 01: Setting up;
-* Chapter 02: Describing a user story as a (functional) test file;
+* Chapter 02: Describing a user story as a functional test file;
 * Chapter 03: Writing first unit test and tying application with the routing part;
-* Chapter 04: Starting using templates, progressing in the functional test;
-* Chapter 05: Starting using ORM, testing persistence, displaying multiple items,
-    functional test refactoring;
+* Chapter 04: Starting to use templates, progressing in the functional test;
+* Chapter 05: Starting to use ORM, testing persistence, displaying multiple
+    items, functional test refactoring;
+* Chapter 06: MVP, each todo item is assigned to a todo list, each view has a
+    single responsibility, the proposed functional test is now passing.
 
 
 # Update notes
 
-_The book uses Django `1.x`, which is slightly incompatible with version `2.0`.
-I noted below the changes that I had to make so everything worked as expected._
+_The book uses Django `1.x`, which is slightly incompatible with version `2.x`.
+I noted below the changes that made make so everything worked as expected._
 
 ## Chapter 03
 
 - Use `from django.urls import resolve` instead of
     `from django.core.urlresolvers import resolve`;
-- There's no need to use BOL and EOL in URL regexes anymore.
+- There's no need to use `^` and `$` in URL regexes anymore.
 
 ## Chapter 05
 
-- To work around the CSRF token remove if from the HTML before asserting.
+- To work around the CSRF token for testing, remove if from the HTML before
+    asserting.
 - Use `functional_tests::_wait_todo_item_appear()` to avoid Selenium complaining
     about stale elements. This happens because the page is refreshed, while
     selenium probably has an instance of a previous DOM element.
@@ -33,7 +36,7 @@ I noted below the changes that I had to make so everything worked as expected._
 
 - In the functional test, I swapped the order between checking for Francis' milk
     and comparing his URL to Edith's since Selenium has to wait the page to
-    refresh. Another option would be to use `WebDriverWait()` following
+    reload. Another option would be to use `WebDriverWait()` following
     `_wait_todo_item_appear()`;
 - Django `2.x` ORM requires `on_delete` attribute when creating FKs, the most
     reasonable choice is `models.CASCADE` in this case;
