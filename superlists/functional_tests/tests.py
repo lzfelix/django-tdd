@@ -4,6 +4,8 @@
 import time
 import unittest
 
+from django.test import LiveServerTestCase
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
@@ -13,8 +15,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
 
-class NewVisitorTest(unittest.TestCase):
-    
+# Use Django's server for testing, thus ensuring DB cleaning ip
+class NewVisitorTest(LiveServerTestCase):
     def setUp(self):
         self.browser = webdriver.Firefox()
 
@@ -58,7 +60,7 @@ class NewVisitorTest(unittest.TestCase):
     
     def test_can_start_a_list_and_retrieve_it_later(self):
         # Check if the page is up
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
 
         # Ensure that the page title mentions a ToDo list
         self.assertIn('To-Do', self.browser.title)
@@ -96,6 +98,3 @@ class NewVisitorTest(unittest.TestCase):
 
         # User quits
         self.browser.quit()
-
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
