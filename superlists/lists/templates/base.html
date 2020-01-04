@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <title>To-Do lists</title>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    </head>
+    <body>
+        <h1>{% block header_text %}{% endblock %}</h1>
+        <form method="POST" action="{% block form_action %}{% endblock %}">
+            <input type="text" name="item_text" id="id_new_item" placeholder="Enter a to-do item">
+            {%csrf_token%}
+        </form>
+        {% block table %}
+        {% endblock %}
+    </body>
+</html>

@@ -58,6 +58,7 @@ class NewVisitorTest(LiveServerTestCase):
         )
 
     
+    # @unittest.SkipTest
     def test_can_start_a_list_and_retrieve_it_later(self):
         # Check if the page is up
         self.browser.get(self.live_server_url)
@@ -123,3 +124,29 @@ class NewVisitorTest(LiveServerTestCase):
 
         # Satified, they both go back to sleep.
         self.browser.quit()
+
+    def test_layout_and_styling(self):
+        """This is completely mobile-friendly hahaha"""
+        # Edith goes to the home page
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+
+        # She notices the input box centralized
+        inputbux = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbux.location['x'] + inputbux.size['width'] / 2,
+            512, 
+            delta=5
+        )
+
+        # She starts a new list and sees the input is nicely cenetered there too
+        self._add_todo_item('testing')
+
+        ## Waiting being redirected to test the new checkbox
+        self._wait_todo_item_appear('testing')
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(
+            inputbux.location['x'] + inputbux.size['width'] / 2,
+            512, 
+            delta=5
+        )
