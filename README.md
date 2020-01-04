@@ -7,6 +7,8 @@ _So, I decided to actually learn TDD by reading a book. You can find it on
 * Chapter 02: Describing a user story as a (functional) test file;
 * Chapter 03: Writing first unit test and tying application with the routing part;
 * Chapter 04: Starting using templates, progressing in the functional test;
+* Chapter 05: Starting using ORM, testing persistence, displaying multiple items,
+    functional test refactoring;
 
 
 # Update notes
@@ -23,3 +25,6 @@ I noted below the changes that I had to make so everything worked as expected._
 ## Chapter 05
 
 - To work around the CSRF token remove if from the HTML before asserting.
+- Use `functional_tests::_wait_todo_item_appear()` to avoid Selenium complaining
+    about stale elements. This happens because the page is refreshed, while selenium
+    probably has an instance of a previous DOM element.
