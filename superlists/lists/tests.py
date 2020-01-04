@@ -6,7 +6,7 @@ from django.http import HttpRequest
 from django.template.loader import render_to_string
 
 from lists.views import home_page
-from lists.models import Item
+from lists.models import Item, List
 
 class HomePageTest(TestCase):
     def test_root_url_resolves_to_home_page_view(self):
@@ -28,6 +28,7 @@ class HomePageTest(TestCase):
         """Remove csrf tag from text. See https://groups.google.com/forum/#!topic/obey-the-testing-goat-book/fwY7ifEWKMU"""
         return re.sub(r'<[^>]*csrfmiddlewaretoken[^>]*>', '', text)
 
+
 class ListViewTest(TestCase):
 
     def test_uses_list_template(self):
@@ -35,8 +36,9 @@ class ListViewTest(TestCase):
         self.assertTemplateUsed(response, 'list.html')
 
     def test_displays_all_items(self):
-        Item.objects.create(text='item1')
-        Item.objects.create(text='item2')
+        list_ = List.objects.create()
+        Item.objects.create(text='item1', list=list_)
+        Item.objects.create(text='item2', list=list_)
 
         response = self.client.get('/lists/first-list/')
 
@@ -62,18 +64,29 @@ class NewListTest(TestCase):
         self.assertRedirects(response, '/lists/first-list/')
 
 
-class ItemModelTest(TestCase):
+class ListAndItemModelTest(TestCase):
     def test_saving_retrieving_items(self):
+        list_ = List()
+        list_.save()
+
         first_item = Item()
         first_item.text = 'The first (ever) list item'
+        first_item.list = list_
         first_item.save()
 
         second_item = Item()
         second_item.text = 'Item, the second'
+        second_item.list = list_
         second_item.save()
 
-        saved_items = Item.objects.all()
+        saved_list = List.objects.first()
+        self.assertEqual(saved_list, list_)
 
+        saved_items = Item.objects.all()
         self.assertEqual(saved_items.count(), 2)
+
         self.assertEqual(saved_items[0].text, first_item.text)
+        self.assertEqual(saved_items[0].list, list_)
+
         self.assertEqual(saved_items[1].text, second_item.text)
+        self.assertEqual(saved_items[1].list, list_)

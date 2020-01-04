@@ -34,4 +34,6 @@ I noted below the changes that I had to make so everything worked as expected._
 - In the functional test, I swapped the order between checking for Francis' milk
     and comparing his URL to Edith's since Selenium has to wait the page to
     refresh. Another option would be to use `WebDriverWait()` following
-    `_wait_todo_item_appear()`.
+    `_wait_todo_item_appear()`;
+- Django `2.x` ORM requires `on_delete` attribute when creating FKs, the most
+    reasonable choice is `models.CASCADE` in this case;
