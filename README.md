@@ -11,6 +11,8 @@ _So, I decided to actually learn TDD by reading a book. You can find it on
     items, functional test refactoring;
 * Chapter 06: MVP, each todo item is assigned to a todo list, each view has a
     single responsibility, the proposed functional test is now passing.
+* Chapter 07: Application styling, handling static files. Just a basic
+    test to ensure that the layout if fine and static files are working.
 
 
 # Update notes
