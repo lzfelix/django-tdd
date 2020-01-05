@@ -3,8 +3,9 @@
 
 import time
 import unittest
+import contextlib
 
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -12,19 +13,28 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.expected_conditions import staleness_of
 from selenium.webdriver.support import expected_conditions
 
 
 # Use Django's server for testing, thus ensuring DB cleaning ip
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
+
     def setUp(self):
         self.browser = webdriver.Firefox()
-
-        # Wait 3 seconds to something expected to appear on the screen
         self.browser.implicitly_wait(3)
     
     def tearDown(self):
         self.browser.quit()
+
+    @contextlib.contextmanager
+    def wait_for_page_load(self, timeout=3):
+        """This avoids Selenium 3.x complaining about stale elements after a
+        page refresh. See https://bit.ly/39I2uMH"""
+        old_page = self.browser.find_element_by_tag_name("html")
+        yield WebDriverWait(self.browser, timeout).until(
+            staleness_of(old_page)
+        )
     
     def _add_todo_item(self, text: str) -> None:
         """Adds item to the todo field and hits Enter."""
@@ -36,29 +46,15 @@ class NewVisitorTest(LiveServerTestCase):
         input_box.send_keys(text)
         input_box.send_keys(Keys.ENTER)
 
-    def _wait_todo_item_appear(self, expected_text: str) -> None:
-        """Checks if the expected text is in the todo table."""
-
-        # NOTE: We have to wait the page to be refreshed. Instead of
-        # a busy wait, one can use the following snippet
-        # (from https://stackoverflow.com/questions/45178817
-        # selenium-with-python-stale-element-reference-exception):
-        WebDriverWait(self.browser, 3).until(
-            expected_conditions.text_to_be_present_in_element(
-                (By.ID, 'id_list_table'), expected_text),
-            f'Timeout, expected finding todo item: "{expected_text}"'
-        )
-
+    def _check_todo_item(self, item: str) -> None:
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
         self.assertIn(
-            expected_text,
+            item,
             [row.text for row in rows],
             f'New to-do item not in the table.\nActual text: "{table.text}"'
         )
 
-    
-    # @unittest.SkipTest
     def test_can_start_a_list_and_retrieve_it_later(self):
         # Check if the page is up
         self.browser.get(self.live_server_url)
@@ -80,7 +76,8 @@ class NewVisitorTest(LiveServerTestCase):
 
         # When user hits enter, the page updates to display
         # "1: Buy peacock feathers" as a item in the to-do list
-        self._wait_todo_item_appear('1: Buy peacock feathers')
+        with self.wait_for_page_load():
+            self._check_todo_item('1: Buy peacock feathers')
 
         # Also, the user is taken to a new URL
         edith_url = self.browser.current_url
@@ -92,8 +89,9 @@ class NewVisitorTest(LiveServerTestCase):
 
         # The page updates again and now shows both items in their
         # list.
-        self._wait_todo_item_appear('1: Buy peacock feathers')
-        self._wait_todo_item_appear('2: Use peacock to make a fly')
+        with self.wait_for_page_load():
+            self._check_todo_item('1: Buy peacock feathers')
+            self._check_todo_item('2: Use peacock to make a fly')
 
         # Now, a new user, Francis, comes along to the site.
 
@@ -110,7 +108,8 @@ class NewVisitorTest(LiveServerTestCase):
 
         # Francis starts a new list by entering a new item.
         self._add_todo_item('Buy milk')
-        self._wait_todo_item_appear('1: Buy milk')
+        with self.wait_for_page_load():
+            self._check_todo_item('1: Buy milk')
 
         # Francis gets his unique URL.
         francis_url = self.browser.current_url
@@ -126,7 +125,6 @@ class NewVisitorTest(LiveServerTestCase):
         self.browser.quit()
 
     def test_layout_and_styling(self):
-        """This is completely mobile-friendly hahaha"""
         # Edith goes to the home page
         self.browser.get(self.live_server_url)
         self.browser.set_window_size(1024, 768)
@@ -142,8 +140,7 @@ class NewVisitorTest(LiveServerTestCase):
         # She starts a new list and sees the input is nicely cenetered there too
         self._add_todo_item('testing')
 
-        ## Waiting being redirected to test the new checkbox
-        self._wait_todo_item_appear('testing')
+        self.wait_for_page_load()
         inputbox = self.browser.find_element_by_id('id_new_item')
         self.assertAlmostEqual(
             inputbux.location['x'] + inputbux.size['width'] / 2,

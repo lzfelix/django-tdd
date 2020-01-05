@@ -16,7 +16,10 @@ _So, I decided to actually learn TDD by reading a book. You can find it on
 # Update notes
 
 _The book uses Django `1.x`, which is slightly incompatible with version `2.x`.
-I noted below the changes that made make so everything worked as expected._
+I noted below the changes that made make so everything worked as expected. After
+reaching Chapter 07, I've notice that I was using Selenium `3.x`, and not `2.x`,
+thus explaining some weird occasional complains about "Stale elements", to solve
+that use the method `wait_for_page_load()` in the functional test_
 
 ## Chapter 03
 
@@ -37,6 +40,11 @@ I noted below the changes that made make so everything worked as expected._
 - In the functional test, I swapped the order between checking for Francis' milk
     and comparing his URL to Edith's since Selenium has to wait the page to
     reload. Another option would be to use `WebDriverWait()` following
-    `_wait_todo_item_appear()`;
+    `wait_for_page_load()`;
 - Django `2.x` ORM requires `on_delete` attribute when creating FKs, the most
     reasonable choice is `models.CASCADE` in this case;
+
+## Chapter 07
+
+- I've used the CDN version of Bootstrap instead of downloading the static
+    content, further, HTML has to be slightly adapter for some reason;
