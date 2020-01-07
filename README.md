@@ -3,25 +3,26 @@
 _So, I decided to actually learn TDD by reading a book. You can find it on
 [Amazon.com](https://www.amazon.com/Test-Driven-Development-Python-Selenium-JavaScript/dp/1449364829)._
 
+Commits in parenthesis indicate end of chapter.
 * Chapter 01: Setting up;
 * Chapter 02: Describing a user story as a functional test file;
-* Chapter 03: Writing first unit test and tying application with the routing part;
-* Chapter 04: Starting to use templates, progressing in the functional test;
+* Chapter 03: Writing first unit test and tying application with the routing part `(8bb3256)`;
+* Chapter 04: Starting to use templates, progressing in the functional test `(c6db2e7)`;
 * Chapter 05: Starting to use ORM, testing persistence, displaying multiple
-    items, functional test refactoring;
+    items, functional test refactoring `(ede0f67)`;
 * Chapter 06: MVP, each todo item is assigned to a todo list, each view has a
-    single responsibility, the proposed functional test is now passing.
+    single responsibility, the proposed functional test is now passing `(286a00b)`.
 * Chapter 07: Application styling, handling static files. Just a basic
-    test to ensure that the layout if fine and static files are working.
+    test to ensure that the layout if fine and static files are working `(2f377a7)`.
 
 
 # Update notes
 
-_The book uses Django `1.x`, which is slightly incompatible with version `2.x`.
-I noted below the changes that made make so everything worked as expected. After
-reaching Chapter 07, I've notice that I was using Selenium `3.x`, and not `2.x`,
+* The book uses Django `1.x`, which is slightly incompatible with version `2.x`.
+I noted below the changes that made make so everything worked as expected.
+* After reaching Chapter 07, I've notice that I was using Selenium `3.x`, and not `2.x`,
 thus explaining some weird occasional complains about "Stale elements", to solve
-that use the method `wait_for_page_load()` in the functional test_
+that use the method `wait_for_page_load()` in the functional test.
 
 ## Chapter 03
 
