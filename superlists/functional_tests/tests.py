@@ -24,8 +24,8 @@ class NewVisitorTest(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         """Hack to allow using a real server to run the tests. If the env var liveserver is set, run functional tests against the real server pointed by this argument, otherwise use the default Django testing server."""
-        if server_url := os.environ.get('liverserver'):
-            cls.server_url = server_url
+        cls.server_url = os.environ.get('liveserver')
+        if cls.server_url:
             return
 
         super().setUpClass()
