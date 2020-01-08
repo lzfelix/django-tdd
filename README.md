@@ -1,7 +1,7 @@
 # Test Driven Development with Django
 
 _So, I decided to actually learn TDD by reading a book. You can find it on
-[Amazon.com](https://www.amazon.com/Test-Driven-Development-Python-Selenium-JavaScript/dp/1449364829)._
+[Amazon.com](https://www.amazon.com/Test-Driven-Development-Python-Selenium-JavaScript/dp/1449364829) or you can [read it online for free](https://www.obeythetestinggoat.com/pages/book.html)._
 
 * Chapter 01: Setting up;
 * Chapter 02: Describing a user story as a functional test file;
@@ -50,3 +50,9 @@ that use the method `wait_for_page_load()` in the functional test_
 
 - I've used the CDN version of Bootstrap instead of downloading the static
     content, further, HTML has to be slightly adapter for some reason;
+
+## Chapter 08
+
+- Using environment variable instead of command line argument to run functional
+    tests against a real server. This avoids `unittest` trying to load a
+    non-existing module with the name of the url

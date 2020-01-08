@@ -1,6 +1,7 @@
 # Maybe some help?
 # http://www.obeythetestinggoat.com/how-to-get-selenium-to-wait-for-page-load-after-a-click.html
 
+import os
 import time
 import unittest
 import contextlib
@@ -20,6 +21,21 @@ from selenium.webdriver.support import expected_conditions
 # Use Django's server for testing, thus ensuring DB cleaning ip
 class NewVisitorTest(StaticLiveServerTestCase):
 
+    @classmethod
+    def setUpClass(cls):
+        """Hack to allow using a real server to run the tests. If the env var liveserver is set, run functional tests against the real server pointed by this argument, otherwise use the default Django testing server."""
+        if server_url := os.environ.get('liverserver'):
+            cls.server_url = server_url
+            return
+
+        super().setUpClass()
+        cls.server_url = cls.live_server_url
+
+    @classmethod
+    def tearDownClass(cls):
+        if cls.server_url == cls.live_server_url:
+            super().tearDownClass()
+
     def setUp(self):
         self.browser = webdriver.Firefox()
         self.browser.implicitly_wait(3)
@@ -28,10 +44,13 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.browser.quit()
 
     @contextlib.contextmanager
-    def wait_for_page_load(self, timeout=3):
+    def wait_for_page_load(self, timeout=3, element_id=None):
         """This avoids Selenium 3.x complaining about stale elements after a
         page refresh. See https://bit.ly/39I2uMH"""
-        old_page = self.browser.find_element_by_tag_name("html")
+        if element_id:
+            old_page = self.browser.find_element_by_id(element_id)
+        else:
+            old_page = self.browser.find_element_by_tag_name("html")
         yield WebDriverWait(self.browser, timeout).until(
             staleness_of(old_page)
         )
@@ -57,7 +76,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
     def test_can_start_a_list_and_retrieve_it_later(self):
         # Check if the page is up
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
 
         # Ensure that the page title mentions a ToDo list
         self.assertIn('To-Do', self.browser.title)
@@ -101,7 +120,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.browser.quit()
         self.browser = webdriver.Firefox()
 
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Buy peacock feathers', page_text)
         self.assertNotIn('make a fly', page_text)
@@ -124,9 +143,10 @@ class NewVisitorTest(StaticLiveServerTestCase):
         # Satified, they both go back to sleep.
         self.browser.quit()
 
+    # @unittest.SkipTest
     def test_layout_and_styling(self):
         # Edith goes to the home page
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         self.browser.set_window_size(1024, 768)
 
         # She notices the input box centralized
@@ -139,8 +159,8 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
         # She starts a new list and sees the input is nicely cenetered there too
         self._add_todo_item('testing')
+        self.wait_for_page_load('id_new_item')
 
-        self.wait_for_page_load()
         inputbox = self.browser.find_element_by_id('id_new_item')
         self.assertAlmostEqual(
             inputbux.location['x'] + inputbux.size['width'] / 2,
