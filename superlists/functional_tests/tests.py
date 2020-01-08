@@ -23,9 +23,15 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Hack to allow using a real server to run the tests. If the env var liveserver is set, run functional tests against the real server pointed by this argument, otherwise use the default Django testing server."""
+        """Hack to allow using a real server to run the tests. If the env var
+        liveserver is set, run functional tests against the real server pointed
+        by this argument, otherwise use the default Django testing server."""
         cls.server_url = os.environ.get('liveserver')
         if cls.server_url:
+            # Avoid super().tearDownClasss() when server_url is set, thus
+            # avoiding teadDownClass to be run on a non-existing server (since
+            # the FT is ran against a nonlocal server)
+            cls.live_server_url = ''
             return
 
         super().setUpClass()
