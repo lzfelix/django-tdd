@@ -5,5 +5,6 @@ superlists/static_content/
 
 *.py[cod]
 *.log
+*.zip
 db.sqlite3
 
